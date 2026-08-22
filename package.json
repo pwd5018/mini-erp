@@ -1,0 +1,24 @@
+{
+  "name": "mini-erp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-first mini ERP foundation for safe, grounded agent workflows.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "db:seed": "tsx src/seed.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "sql.js": "^1.13.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/sql.js": "^1.4.9",
+    "@types/node": "^22.15.30",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
