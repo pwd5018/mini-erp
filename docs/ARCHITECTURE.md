@@ -4,6 +4,8 @@ Phase 1 is intentionally a deterministic foundation. SQLite is accessed through 
 
 Phase 2 adds a real read-only MCP server in `src/mcp/readServer.ts`. It registers six tools over the repository boundary: open orders, one order, inventory, customers, suppliers, and replenishment requests. `src/mcp/stdio.ts` exposes the server over MCP stdio for a compatible host. The server validates inputs before running repository reads and records every attempt through `TraceRecorder`.
 
+Phase 3 adds `src/agent/orchestrator.ts`. The orchestrator accepts a user request, asks an `AgentModel` which read tools are needed, calls those tools through an MCP client, applies the deterministic shortage service, and returns a grounded read-only answer. It has bounded rounds and tool-call limits. `OpenAIModel` is the production provider adapter; the test model exists only to make automated tests deterministic.
+
 Planned flow:
 
 ```text

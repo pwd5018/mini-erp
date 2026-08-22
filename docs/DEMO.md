@@ -15,3 +15,12 @@ Phase 2 demo:
 2. Run `npm test`.
 3. The MCP server can be started with `npm run mcp:stdio` for an MCP-compatible client.
 4. Explain that `get_inventory` returns both warehouse records for `P-001`, while invalid input and unknown order IDs return tool errors and trace events.
+
+Phase 3 demo with a real provider:
+
+1. Set `OPENAI_API_KEY` in the shell; optionally set `OPENAI_MODEL`.
+2. Run `npm run db:seed`.
+3. Run `npm run agent -- "Which open orders are at risk because of inventory shortages?"`.
+4. Review the response, findings, tool calls, and trace IDs printed as JSON.
+
+The command is read-only. It has no write tools and cannot create replenishment requests.
