@@ -46,6 +46,24 @@ export interface SalesOrder {
   lineItems: OrderLine[];
 }
 
+export interface Supplier {
+  supplierId: string;
+  name: string;
+  averageLeadTimeDays: number;
+  reliabilityScore: number;
+}
+
+export interface ReplenishmentRequest {
+  requestId: string;
+  productId: string;
+  quantity: number;
+  reason: string;
+  linkedOrderId: string | null;
+  status: "PENDING" | "APPROVED" | "COMPLETED" | "CANCELLED";
+  createdAt: string;
+  approvedBy: string | null;
+}
+
 export interface AtRiskLine {
   orderId: string;
   lineId: string;

@@ -7,16 +7,18 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "db:seed": "tsx src/seed.ts",
+    "mcp:stdio": "tsx src/mcp/stdio.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.23.0",
     "sql.js": "^1.13.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/sql.js": "^1.4.9",
     "@types/node": "^22.15.30",
+    "@types/sql.js": "^1.4.9",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
