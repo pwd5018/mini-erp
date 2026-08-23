@@ -12,14 +12,14 @@ const productIdInput = z.object({ productId: z.string().trim().min(1).max(32) })
 const customerIdInput = z.object({ customerId: z.string().trim().min(1).max(32) }).strict();
 const supplierIdInput = z.object({ supplierId: z.string().trim().min(1).max(32) }).strict();
 const openOrdersInput = z.object({
-  startDate: z.string().date().optional(),
-  endDate: z.string().date().optional(),
-  customerId: z.string().trim().min(1).max(32).optional(),
-  priority: z.enum(["HIGH", "NORMAL", "LOW"]).optional(),
+  startDate: z.string().date().nullable().optional(),
+  endDate: z.string().date().nullable().optional(),
+  customerId: z.string().trim().min(1).max(32).nullable().optional(),
+  priority: z.enum(["HIGH", "NORMAL", "LOW"]).nullable().optional(),
 }).strict().refine((input) => !input.startDate || !input.endDate || input.startDate <= input.endDate, { message: "startDate must be on or before endDate" });
 const replenishmentInput = z.object({
-  productId: z.string().trim().min(1).max(32).optional(),
-  status: z.enum(["PENDING", "APPROVED", "COMPLETED", "CANCELLED"]).optional(),
+  productId: z.string().trim().min(1).max(32).nullable().optional(),
+  status: z.enum(["PENDING", "APPROVED", "COMPLETED", "CANCELLED"]).nullable().optional(),
 }).strict();
 
 const outputSchema = z.object({ data: z.any(), traceId: z.string() });

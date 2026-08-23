@@ -22,7 +22,19 @@ export class AgentOrchestrator {
     const sessionId = `session-${randomUUID()}`;
     const evidence: AgentEvidence[] = [];
     const toolCalls: AgentRun["toolCalls"] = [];
+    const executedCalls = new Set<string>();
     let rounds = 0;
+
+    const execute = async (call: { name: string; arguments: unknown }): Promise<unknown | undefined> => {
+      const callKey = `${call.name}:${JSON.stringify(call.arguments)}`;
+      if (executedCalls.has(callKey)) return undefined;
+      executedCalls.add(callKey);
+      if (!readToolDefinitions.some((tool) => tool.name === call.name)) throw new Error(`The agent requested an unavailable tool: ${call.name}`);
+      const result = await this.mcp.call(call.name, call.arguments);
+      toolCalls.push({ name: call.name, arguments: call.arguments, traceId: result.traceId });
+      evidence.push({ toolName: call.name, arguments: call.arguments, result: result.data, traceId: result.traceId });
+      return result.data;
+    };
 
     while (rounds < this.maxRounds && toolCalls.length < this.maxToolCalls) {
       rounds += 1;
@@ -33,10 +45,14 @@ export class AgentOrchestrator {
       if (decision.toolCalls.length === 0) throw new Error("The agent requested no tools and produced no answer.");
       for (const call of decision.toolCalls) {
         if (toolCalls.length >= this.maxToolCalls) break;
-        if (!readToolDefinitions.some((tool) => tool.name === call.name)) throw new Error(`The agent requested an unavailable tool: ${call.name}`);
-        const result = await this.mcp.call(call.name, call.arguments);
-        toolCalls.push({ name: call.name, arguments: call.arguments, traceId: result.traceId });
-        evidence.push({ toolName: call.name, arguments: call.arguments, result: result.data, traceId: result.traceId });
+        const result = await execute(call);
+        if (call.name === "get_open_orders" && Array.isArray(result)) {
+          const productIds = [...new Set((result as SalesOrder[]).flatMap((order) => order.lineItems.map((line) => line.productId)))];
+          for (const productId of productIds) {
+            if (toolCalls.length >= this.maxToolCalls) break;
+            await execute({ name: "get_inventory", arguments: { productId } });
+          }
+        }
       }
     }
 
@@ -54,7 +70,9 @@ export class AgentOrchestrator {
       const productId = records[0].productId;
       inventoryByProduct.set(productId, records.reduce((total, record) => total + record.available, 0));
     }
-    return findAtRiskLines(orders, inventoryByProduct);
+    const uniqueFindings = new Map<string, AtRiskLine>();
+    for (const finding of findAtRiskLines(orders, inventoryByProduct)) uniqueFindings.set(`${finding.orderId}:${finding.lineId}:${finding.productId}`, finding);
+    return [...uniqueFindings.values()];
   }
 
   private asOrders(result: unknown): SalesOrder[] {
