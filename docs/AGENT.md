@@ -23,7 +23,8 @@ Grounded response
 ## Run
 
 ```powershell
-$env:OPENAI_API_KEY = "your-key"
+Copy-Item .env.example .env
+# Edit .env and replace OPENAI_API_KEY with your real key.
 npm run db:seed
 npm run agent -- "Which open orders are at risk because of inventory shortages?"
 ```

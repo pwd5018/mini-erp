@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { readFileSync } from "node:fs";
 import initSqlJs from "sql.js";
 import { createEmbeddedMcpClient } from "./mcpClient.js";
