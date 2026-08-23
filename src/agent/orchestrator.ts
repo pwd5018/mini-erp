@@ -32,7 +32,7 @@ export class AgentOrchestrator {
       if (!readToolDefinitions.some((tool) => tool.name === call.name)) throw new Error(`The agent requested an unavailable tool: ${call.name}`);
       const result = await this.mcp.call(call.name, call.arguments);
       toolCalls.push({ name: call.name, arguments: call.arguments, traceId: result.traceId });
-      evidence.push({ toolName: call.name, arguments: call.arguments, result: result.data, traceId: result.traceId });
+      evidence.push({ toolName: call.name, arguments: call.arguments, result: result.data, error: result.error, traceId: result.traceId });
       return result.data;
     };
 

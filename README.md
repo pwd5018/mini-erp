@@ -31,6 +31,7 @@ The seed command creates `data/mini-erp.db`, which is intentionally ignored by G
 - Domain and database tests: complete
 - Read-only MCP tools and tool-call traces: complete in Phase 2
 - Read-only agent orchestrator and model-provider abstraction: complete in Phase 3
-- Writes, approvals, UI, and eval runner: reserved for later phases
+- Controlled evaluation harness for the first four scenarios: complete in Phase 4
+- Writes, approvals, and UI: reserved for later phases
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/EVALUATIONS.md](docs/EVALUATIONS.md), and [docs/DEMO.md](docs/DEMO.md).

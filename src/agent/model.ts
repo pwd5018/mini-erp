@@ -4,7 +4,8 @@ import type { AgentToolDefinition } from "../mcp/catalog.js";
 export interface AgentEvidence {
   toolName: string;
   arguments: unknown;
-  result: unknown;
+  result?: unknown;
+  error?: string;
   traceId?: string;
 }
 

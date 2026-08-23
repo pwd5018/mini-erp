@@ -55,6 +55,7 @@ export class ReadToolService {
       return { data, traceId: trace.traceId };
     } catch (error) {
       const toolError = asToolError(error);
+      toolError.traceId = trace.traceId;
       this.recorder.complete(trace, false, { code: toolError.code, message: toolError.message });
       throw toolError;
     }
@@ -82,7 +83,7 @@ function registerReadTool(server: McpServer, service: ReadToolService, name: Rea
       return { structuredContent: result, content: [{ type: "text", text: JSON.stringify(result) }] };
     } catch (error) {
       const toolError = asToolError(error);
-      return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: { code: toolError.code, message: toolError.message } }) }] };
+      return { isError: true, content: [{ type: "text", text: JSON.stringify({ error: { code: toolError.code, message: toolError.message }, traceId: toolError.traceId }) }] };
     }
   });
 }
