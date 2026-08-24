@@ -18,4 +18,4 @@ User -> Agent orchestrator -> typed MCP read tools -> repositories -> SQLite
                          -> trace and audit store
 ```
 
-The next planned boundary is an authenticated approval inbox and notification flow. Later, the local repository write will be replaced by a typed ERP API adapter. The application will never delegate security or core ERP calculations to the model.
+The next planned boundary is a compact local approval walkthrough and stronger demonstration evaluations. This project intentionally stops short of commercial ERP integration, SSO, and production infrastructure. The application will never delegate security or core ERP calculations to the model.

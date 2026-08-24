@@ -8,6 +8,6 @@ Phase 3 keeps the agent read-only. The model receives only the read-tool catalog
 
 Phase 5 keeps write authorization outside the model. Actor roles are supplied by the application context, not by tool arguments. Analysts may propose but cannot approve or execute. Managers must approve an exact action ID, and execution revalidates the product and linked order. Idempotency keys and a transaction prevent duplicate or half-completed replenishment writes.
 
-The current role model is deliberately a demo. It does not yet integrate with SSO, an employee directory, approval limits, warehouse scope, tenant scope, delegation, or separation-of-duties policy.
+The current role model is deliberately a demo. It does not integrate with SSO or an employee directory because enterprise identity is outside this project's demonstration scope. The relevant concepts are represented locally through application-supplied actor roles and approval checks.
 
-Planned controls include authenticated identity-provider integration, deterministic role and scope checks outside the model, explicit structured approvals for every write, strict Zod input schemas, record existence checks, idempotency keys, and verification after uncertain transactions.
+The demonstration focus is deterministic role checks outside the model, explicit structured approvals for every write, strict Zod input schemas, record existence checks, idempotency keys, prompt-injection resistance, and verification after uncertain transactions.

@@ -2,7 +2,7 @@
 
 ## Product vision
 
-Build a safe AI operations assistant for ERP work. The assistant should understand a user's request, gather evidence through typed tools, explain its reasoning, propose actions when appropriate, and require an authorized human approval before changing business data.
+Build a compact, interview-ready demonstration of a safe AI operations assistant for ERP-style work. The assistant should understand a user's request, gather evidence through typed tools, explain its reasoning, propose actions when appropriate, and require an authorized human approval before changing business data.
 
 The model is useful for language understanding and planning. It is not the source of business truth, authorization, approval, or arithmetic. Those responsibilities stay in deterministic application code and, in a real deployment, are ultimately revalidated by the ERP API.
 
@@ -18,7 +18,23 @@ User
   -> Evidence, traces, evaluations, and audit records
 ```
 
-The current repository uses one local SQLite database for the demo. A production version would normally place the custom agent service in front of an existing ERP API rather than sharing its database.
+The repository intentionally uses one local SQLite database. It is a teaching and demonstration system, not an attempt to reproduce or integrate with a commercial ERP.
+
+## Demonstration goals
+
+The build is specifically intended to prove understanding of:
+
+- MCP tools and typed tool boundaries
+- Agent orchestration and bounded tool loops
+- ERP-style entities and workflows
+- Human approval gates
+- Deterministic evaluation harnesses
+- Safe execution and authorization boundaries
+- Idempotent writes
+- Prompt-injection resistance
+- Observability and tracing
+
+The goal is a clean vertical slice that makes these concepts easy to inspect, run, and explain in an interview.
 
 ## Milestones
 
@@ -68,51 +84,38 @@ The current repository uses one local SQLite database for the demo. A production
 
 ## Next milestones
 
-### Phase 6 — Approval inbox and notifications — pending
+### Phase 6 — Demonstration approval experience — pending
 
-- Web approval inbox for pending actions
+- Small local approval inbox or CLI approval walkthrough for pending actions
 - Detail view showing the proposed change and supporting evidence
 - Approve and reject actions
-- Authenticated user context rather than demo roles
-- Email or in-app notifications
 - Approval history and rejection reasons
-- Tests for authorization, stale actions, duplicate clicks, and notification links
+- Tests for authorization, stale actions, and duplicate clicks
 
-### Phase 7 — Identity and policy — pending
+### Phase 7 — Demonstration hardening — pending
 
-- SSO integration with an identity provider
-- Role and permission mapping
-- Warehouse, department, tenant, and monetary-scope restrictions
-- Separation-of-duties rules
-- Delegation and escalation rules
-- Policy versioning and auditability
+- Improve the local demo role model enough to show separation of duties
+- Add explicit policy examples and failure cases
+- Expand prompt-injection and unsafe-tool evaluation scenarios
+- Add a concise trace viewer or trace report
 
-### Phase 8 — Real ERP adapter — pending
+## Out of scope
 
-- Replace local replenishment insertion with a typed ERP API adapter
-- Map ERP statuses and error responses
-- Handle timeouts and uncertain outcomes safely
-- Reconcile agent actions with ERP transaction IDs
-- Revalidate all ERP-owned business rules at the ERP boundary
-
-### Phase 9 — Production operations — pending
-
-- Durable production database and migrations
-- Background jobs and retry policy
-- Centralized audit and trace storage
-- Metrics, alerting, and operational dashboards
-- Secret management and deployment configuration
-- Rate limits, tenant isolation, and security review
+- Real commercial ERP integration
+- SSO, HR directory synchronization, or enterprise identity lifecycle
+- Email delivery infrastructure
+- Multi-tenant deployment
+- Production database migrations and high availability
+- Cloud deployment, monitoring, and on-call operations
 
 ## Explicitly not complete yet
 
-- There is no browser UI.
-- There is no email notification flow.
-- The current role is a demo `ActorContext`, not SSO-backed authorization.
-- The local SQLite database is not a production ERP.
-- The OpenAI agent is still read-only; write execution is exposed only through the separately tested write server.
-- There is no real external ERP API adapter.
-- There is no migration framework; schema creation currently recreates the local demo schema.
+- There is no browser approval UI yet; approval is currently demonstrated through the write MCP tests.
+- There is no email notification flow, and none is required for the demonstration target.
+- The role model is intentionally local and simplified.
+- The OpenAI agent is still read-only; write execution is exposed through the separately tested write server.
+- There is no real external ERP API adapter because ERP integration is outside the target scope.
+- There is no migration framework because the local database is a disposable demonstration database.
 
 ## Restart instructions
 
@@ -133,4 +136,3 @@ npm run agent -- "Which open orders are at risk because of inventory shortages?"
 ```
 
 The controlled evaluation suite does not use the OpenAI API and does not require `.env`.
-
