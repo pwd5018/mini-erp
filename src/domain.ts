@@ -1,4 +1,5 @@
 export type OrderStatus = "OPEN" | "CLOSED" | "SHIPPED";
+export type UserRole = "OPERATIONS_ANALYST" | "OPERATIONS_MANAGER";
 
 export interface Customer {
   id: string;
@@ -62,6 +63,32 @@ export interface ReplenishmentRequest {
   status: "PENDING" | "APPROVED" | "COMPLETED" | "CANCELLED";
   createdAt: string;
   approvedBy: string | null;
+}
+
+export interface ReplenishmentPayload {
+  productId: string;
+  quantity: number;
+  reason: string;
+  linkedOrderId: string | null;
+  idempotencyKey: string;
+}
+
+export interface AgentAction {
+  actionId: string;
+  sessionId: string;
+  actionType: "CREATE_REPLENISHMENT_REQUEST";
+  requestedBy: string;
+  requestedByRole: UserRole;
+  approvalRequired: true;
+  approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
+  executionStatus: "NOT_STARTED" | "COMPLETED" | "FAILED";
+  idempotencyKey: string;
+  payload: ReplenishmentPayload;
+  createdAt: string;
+  approvedBy: string | null;
+  approvedAt: string | null;
+  completedAt: string | null;
+  result: ReplenishmentRequest | null;
 }
 
 export interface AtRiskLine {

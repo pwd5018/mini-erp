@@ -20,7 +20,7 @@ if (process.argv[1]?.endsWith("seed.ts") || process.argv[1]?.endsWith("seed.js")
   mkdirSync("data", { recursive: true });
   const db = new SQL.Database();
   createSchema(db);
-  db.exec("DELETE FROM replenishment_requests; DELETE FROM sales_order_lines; DELETE FROM sales_orders; DELETE FROM inventory; DELETE FROM suppliers; DELETE FROM products; DELETE FROM customers;");
+  db.exec("DELETE FROM agent_actions; DELETE FROM replenishment_requests; DELETE FROM sales_order_lines; DELETE FROM sales_orders; DELETE FROM inventory; DELETE FROM suppliers; DELETE FROM products; DELETE FROM customers;");
   insertSeedData(db, seedData);
   writeFileSync("data/mini-erp.db", Buffer.from(db.export()));
   db.close();

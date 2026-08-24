@@ -6,4 +6,6 @@ Phase 2 remains read-only. MCP inputs use strict Zod schemas, unknown fields are
 
 Phase 3 keeps the agent read-only. The model receives only the read-tool catalog, the orchestrator rejects tool names outside that catalog, and bounded rounds/tool calls prevent an unending tool loop. The model is not trusted to calculate shortage truth or authorize mutations.
 
+Phase 5 keeps write authorization outside the model. Actor roles are supplied by the application context, not by tool arguments. Analysts may propose but cannot approve or execute. Managers must approve an exact action ID, and execution revalidates the product and linked order. Idempotency keys and a transaction prevent duplicate or half-completed replenishment writes.
+
 Planned controls include deterministic role checks outside the model, explicit structured approvals for every write, strict Zod input schemas, record existence checks, idempotency keys, and verification after uncertain transactions.

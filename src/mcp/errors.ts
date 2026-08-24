@@ -1,4 +1,4 @@
-export type ToolErrorCode = "INVALID_INPUT" | "NOT_FOUND" | "INTERNAL_ERROR";
+export type ToolErrorCode = "INVALID_INPUT" | "NOT_FOUND" | "FORBIDDEN" | "CONFLICT" | "INVALID_STATE" | "INTERNAL_ERROR";
 
 export class ToolError extends Error {
   public traceId?: string;

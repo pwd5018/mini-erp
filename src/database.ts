@@ -1,5 +1,5 @@
 import type { Database } from "sql.js";
-import type { Customer, Inventory, OrderLine, Product, ReplenishmentRequest, SalesOrder, Supplier } from "./domain.js";
+import type { AgentAction, Customer, Inventory, OrderLine, Product, ReplenishmentRequest, SalesOrder, Supplier, UserRole } from "./domain.js";
 
 export function createSchema(db: Database): void {
   db.exec(`
@@ -40,6 +40,13 @@ export function createSchema(db: Database): void {
       created_at TEXT NOT NULL, approved_by TEXT,
       FOREIGN KEY (product_id) REFERENCES products(id),
       FOREIGN KEY (linked_order_id) REFERENCES sales_orders(order_id)
+    );
+    CREATE TABLE IF NOT EXISTS agent_actions (
+      action_id TEXT PRIMARY KEY, session_id TEXT NOT NULL, action_type TEXT NOT NULL,
+      requested_by TEXT NOT NULL, requested_by_role TEXT NOT NULL, approval_required INTEGER NOT NULL,
+      approval_status TEXT NOT NULL, execution_status TEXT NOT NULL, idempotency_key TEXT NOT NULL UNIQUE,
+      payload_json TEXT NOT NULL, created_at TEXT NOT NULL, approved_by TEXT, approved_at TEXT,
+      completed_at TEXT, result_json TEXT
     );
   `);
 }
@@ -99,6 +106,41 @@ export function getReplenishmentRequests(db: Database, productId?: string, statu
   if (status) { conditions.push("status = ?"); params.push(status); }
   const where = conditions.length ? ` WHERE ${conditions.join(" AND ")}` : "";
   return queryRows(db, `SELECT request_id AS requestId, product_id AS productId, quantity, reason, linked_order_id AS linkedOrderId, status, created_at AS createdAt, approved_by AS approvedBy FROM replenishment_requests${where} ORDER BY created_at DESC`, params) as ReplenishmentRequest[];
+}
+
+export function getProduct(db: Database, productId: string): Product | null {
+  const row = queryRows(db, "SELECT id, sku, name, description, reorder_point AS reorderPoint, default_supplier_id AS defaultSupplierId FROM products WHERE id = ?", [productId])[0];
+  return row ? row as Product : null;
+}
+
+export function getAgentAction(db: Database, actionId: string): AgentAction | null {
+  const row = queryRows(db, "SELECT * FROM agent_actions WHERE action_id = ?", [actionId])[0];
+  return row ? mapAgentAction(row) : null;
+}
+
+export function getAgentActionByIdempotencyKey(db: Database, idempotencyKey: string): AgentAction | null {
+  const row = queryRows(db, "SELECT * FROM agent_actions WHERE idempotency_key = ?", [idempotencyKey])[0];
+  return row ? mapAgentAction(row) : null;
+}
+
+export function insertAgentAction(db: Database, action: AgentAction): void {
+  db.run("INSERT INTO agent_actions (action_id, session_id, action_type, requested_by, requested_by_role, approval_required, approval_status, execution_status, idempotency_key, payload_json, created_at, approved_by, approved_at, completed_at, result_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [action.actionId, action.sessionId, action.actionType, action.requestedBy, action.requestedByRole, 1, action.approvalStatus, action.executionStatus, action.idempotencyKey, JSON.stringify(action.payload), action.createdAt, action.approvedBy, action.approvedAt, action.completedAt, action.result ? JSON.stringify(action.result) : null]);
+}
+
+export function updateAgentAction(db: Database, action: AgentAction): void {
+  db.run("UPDATE agent_actions SET approval_status = ?, execution_status = ?, approved_by = ?, approved_at = ?, completed_at = ?, result_json = ? WHERE action_id = ?", [action.approvalStatus, action.executionStatus, action.approvedBy, action.approvedAt, action.completedAt, action.result ? JSON.stringify(action.result) : null, action.actionId]);
+}
+
+function mapAgentAction(row: Record<string, any>): AgentAction {
+  return {
+    actionId: row.action_id, sessionId: row.session_id, actionType: row.action_type,
+    requestedBy: row.requested_by, requestedByRole: row.requested_by_role as UserRole,
+    approvalRequired: true, approvalStatus: row.approval_status,
+    executionStatus: row.execution_status, idempotencyKey: row.idempotency_key,
+    payload: JSON.parse(row.payload_json), createdAt: row.created_at,
+    approvedBy: row.approved_by ?? null, approvedAt: row.approved_at ?? null,
+    completedAt: row.completed_at ?? null, result: row.result_json ? JSON.parse(row.result_json) : null,
+  };
 }
 
 export function countRows(db: Database, table: "customers" | "products" | "inventory" | "sales_orders" | "sales_order_lines"): number {
