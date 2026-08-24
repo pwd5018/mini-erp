@@ -36,6 +36,22 @@ The build is specifically intended to prove understanding of:
 
 The goal is a clean vertical slice that makes these concepts easy to inspect, run, and explain in an interview.
 
+## Job-target alignment
+
+The target Agent / Applied AI Engineer role emphasizes agents that act inside real business workflows, typed and intent-routed MCP tools, composable AI-first experiences, and an evaluation harness that measures whether the experience is improving. This project maps directly to those themes through:
+
+| Role theme | Demonstration evidence |
+| --- | --- |
+| Agents with workflow authority | ERP-style order, inventory, and replenishment flow with a gated write path |
+| Typed MCP tools | Separate read and write MCP servers with strict schemas |
+| Grounded retrieval | Tool evidence plus deterministic shortage findings |
+| Safe action | Analyst proposal, manager approval, revalidation, and idempotent execution |
+| Evaluation | Controlled scenarios for grounding, hallucination, authorization, and business outcome |
+| AI-first interaction | Natural-language request translated into tool calls and an explainable result |
+| Operational confidence | Trace IDs, tool-call evidence, bounded orchestration, and failure handling |
+
+The application does not need to reproduce Rootstock or Salesforce. Its value is demonstrating clear opinions about tool scope, grounding, failure safety, and measurement in a small system that can be run and discussed.
+
 ## Milestones
 
 ### Phase 1 — ERP foundation — complete
