@@ -110,6 +110,7 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 - Concise lifecycle trace summary
 - `Eval-006-EndToEndApprovedReplenishment`
 - `npm run demo` entry point
+- `npm run demo:live` provider-backed variant using the same safety controls
 
 ### Phase 7 — Portfolio polish — pending
 

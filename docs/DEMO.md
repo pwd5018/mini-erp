@@ -51,3 +51,16 @@ npm run demo
 12. Print concise lifecycle events and MCP tool-trace count.
 
 The demo uses the real in-memory MCP client/server boundary for both reads and writes. It does not expose write tools to the OpenAI production agent; the explicit approval workflow is application-controlled.
+
+## Live OpenAI agent variant
+
+The same end-to-end flow can use the OpenAI agent for the intent and read-tool planning stage:
+
+```powershell
+Copy-Item .env.example .env
+# Set OPENAI_API_KEY and OPENAI_MODEL in .env.
+npm run db:seed
+npm run demo:live
+```
+
+In live mode, OpenAI selects only the read MCP tools. The application still performs the deterministic shortage calculation, creates the structured recommendation, enforces analyst/manager authorization, executes the write MCP tool, verifies the transaction, and prints the trace. This preserves the safety boundary while demonstrating the real provider path.

@@ -10,6 +10,7 @@
     "mcp:stdio": "tsx src/mcp/stdio.ts",
     "agent": "tsx src/agent/cli.ts",
     "demo": "tsx src/demo/cli.ts",
+    "demo:live": "tsx src/demo/cli.ts --live",
     "evals": "tsx src/evals/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest"

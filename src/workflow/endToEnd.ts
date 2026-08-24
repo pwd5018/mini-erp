@@ -1,6 +1,7 @@
 import type { Database } from "sql.js";
 import { AgentOrchestrator, TestAgentModel, type AgentRun } from "../agent/orchestrator.js";
 import { createEmbeddedMcpClient, createEmbeddedWriteMcpClient } from "../agent/mcpClient.js";
+import type { AgentModel } from "../agent/model.js";
 import type { ReplenishmentPayload } from "../domain.js";
 import { TraceRecorder, type TraceEvent } from "../observability/trace.js";
 
@@ -26,7 +27,7 @@ export interface EndToEndWorkflowResult {
 
 const REQUEST = "Which open orders are at risk because of inventory shortages?";
 
-export async function runEndToEndWorkflow(db: Database, request = REQUEST): Promise<EndToEndWorkflowResult> {
+export async function runEndToEndWorkflow(db: Database, request = REQUEST, model: AgentModel = new TestAgentModel()): Promise<EndToEndWorkflowResult> {
   const recorder = new TraceRecorder();
   recorder.recordEvent("USER_REQUEST", request);
   recorder.recordEvent("INTENT", "Inventory shortage analysis");
@@ -35,7 +36,7 @@ export async function runEndToEndWorkflow(db: Database, request = REQUEST): Prom
   let analyst: Awaited<ReturnType<typeof createEmbeddedWriteMcpClient>> | undefined;
   let manager: Awaited<ReturnType<typeof createEmbeddedWriteMcpClient>> | undefined;
   try {
-    const analysis = await new AgentOrchestrator(new TestAgentModel(), read.client).run(request);
+    const analysis = await new AgentOrchestrator(model, read.client).run(request);
     if (analysis.findings.length !== 1) throw new Error(`Expected one demo shortage finding, received ${analysis.findings.length}.`);
     const finding = analysis.findings[0];
     recorder.recordEvent("FINDING", `${finding.orderId}: ${finding.quantityRequired} required, ${finding.availableInventory} available, shortage ${finding.shortage}.`, finding);

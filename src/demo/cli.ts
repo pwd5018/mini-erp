@@ -1,13 +1,17 @@
+import "dotenv/config";
 import { readFileSync } from "node:fs";
 import initSqlJs from "sql.js";
+import { OpenAIModel } from "../agent/model.js";
+import { TestAgentModel } from "../agent/orchestrator.js";
 import { runEndToEndWorkflow } from "../workflow/endToEnd.js";
 
 const SQL = await initSqlJs();
+const live = process.argv.includes("--live");
 let db;
 try {
   db = new SQL.Database(new Uint8Array(readFileSync("data/mini-erp.db")));
-  const result = await runEndToEndWorkflow(db);
-  console.log("AI-FIRST MINI ERP — END-TO-END DEMO\n");
+  const result = await runEndToEndWorkflow(db, undefined, live ? new OpenAIModel() : new TestAgentModel());
+  console.log(`AI-FIRST MINI ERP — END-TO-END DEMO (${live ? "OPENAI AGENT" : "DETERMINISTIC AGENT"})\n`);
   console.log(`USER REQUEST\n${result.request}\n`);
   console.log(`AGENT RESPONSE\n${result.analysis.response}\n`);
   console.log(`FINDING\n${result.recommendation.linkedOrderId}: ${result.recommendation.productId}, shortage ${result.recommendation.quantity}\n`);

@@ -18,7 +18,7 @@ The current slice uses a small TypeScript project with three boundaries. SQLite 
 
 The current repository also contains read-only MCP tools, a read-only OpenAI agent, an evaluation harness, and a separately tested approval-gated write MCP server. The demo uses SQLite by design. It is intended to showcase engineering concepts, not integrate with a commercial ERP or become a production service.
 
-The primary demonstration is the complete approved replenishment workflow. It uses the deterministic test agent, so `npm run demo` does not require an OpenAI API key.
+The primary demonstration is the complete approved replenishment workflow. `npm run demo` uses the deterministic test agent and does not require an OpenAI API key. `npm run demo:live` runs the same flow with the OpenAI agent for live intent and read-tool planning.
 
 ## Run locally
 
