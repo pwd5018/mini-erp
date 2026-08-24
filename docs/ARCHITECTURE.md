@@ -6,6 +6,8 @@ Phase 2 adds a real read-only MCP server in `src/mcp/readServer.ts`. It register
 
 Phase 3 adds `src/agent/orchestrator.ts`. The orchestrator accepts a user request, asks an `AgentModel` which read tools are needed, calls those tools through an MCP client, applies the deterministic shortage service, and returns a grounded read-only answer. It has bounded rounds and tool-call limits. `OpenAIModel` is the production provider adapter; the test model exists only to make automated tests deterministic.
 
+Phase 4 adds the controlled evaluation harness. It runs deterministic scenarios through the real MCP client/server path and scores tool use, grounding, hallucination resistance, authorization, safe execution, and business outcome.
+
 Phase 5 adds a separate write MCP server. `propose_replenishment_request` creates a pending action, `approve_action` requires an Operations Manager, and `create_replenishment_request` requires that exact action to be approved. The action record and replenishment insert are persisted with an idempotency key and transaction-safe completion state.
 
 Planned flow:
@@ -16,4 +18,4 @@ User -> Agent orchestrator -> typed MCP read tools -> repositories -> SQLite
                          -> trace and audit store
 ```
 
-The model-provider interface and MCP boundary will be introduced in Phase 3 after read tools are independently testable. The application will never delegate security or core ERP calculations to the model.
+The next planned boundary is an authenticated approval inbox and notification flow. Later, the local repository write will be replaced by a typed ERP API adapter. The application will never delegate security or core ERP calculations to the model.

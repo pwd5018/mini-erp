@@ -1,8 +1,14 @@
 # AI-First Mini ERP
 
-An enterprise-style foundation for a safe AI operations agent. The first milestone is deliberately deterministic: a seeded SQLite ERP dataset and domain services that can identify inventory shortages. Later phases will add typed MCP read tools, model-provider adapters, approval-gated writes, traces, evaluations, and a UI.
+An enterprise-style foundation for a safe AI operations agent. The assistant gathers evidence through typed tools, produces grounded findings, and uses approval gates before business mutations.
 
-## Phase 1 architecture
+## Design principles
+
+The model interprets intent and plans tool calls. Application code owns business truth, validation, authorization, approval, idempotency, and execution. In a real deployment, the ERP API remains the final authority for ERP-owned business rules.
+
+See [ROADMAP.md](ROADMAP.md) for the complete vision, milestones, pending work, limitations, and restart instructions.
+
+## Current architecture
 
 The current slice uses a small TypeScript project with three boundaries. SQLite runs through `sql.js` WebAssembly so local setup does not require native C++ build tooling:
 
@@ -10,7 +16,7 @@ The current slice uses a small TypeScript project with three boundaries. SQLite 
 - `src/database.ts` owns SQLite schema, seed insertion, and read repositories.
 - `src/seed.ts` provides realistic demo data, including shortages, inbound stock, closed orders, and an untrusted prompt-injection note.
 
-The future agent will sit above these boundaries. The model may interpret intent and plan reads, but business truth, validation, authorization, approval, and execution remain application-owned.
+The current repository also contains read-only MCP tools, a read-only OpenAI agent, an evaluation harness, and a separately tested approval-gated write MCP server. The demo uses SQLite; a production integration would normally call an ERP API.
 
 ## Run locally
 
@@ -23,16 +29,16 @@ npm run build
 
 The seed command creates `data/mini-erp.db`, which is intentionally ignored by Git.
 
-## Phase 1 status
+## Status
 
 - Application foundation and TypeScript build: complete
 - Seeded SQLite database: complete
 - Deterministic shortage service: complete
 - Domain and database tests: complete
-- Read-only MCP tools and tool-call traces: complete in Phase 2
-- Read-only agent orchestrator and model-provider abstraction: complete in Phase 3
-- Controlled evaluation harness for the first four scenarios: complete in Phase 4
-- Approval-gated, idempotent replenishment write service: complete in Phase 5
-- Production agent write exposure and UI: reserved for later phases
+- Read-only MCP tools and tool-call traces: complete
+- Read-only agent orchestrator and model-provider abstraction: complete
+- Controlled evaluation harness: complete
+- Approval-gated, idempotent replenishment write service: complete
+- Approval inbox, notifications, SSO-backed roles, policy engine, and real ERP adapter: pending
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/EVALUATIONS.md](docs/EVALUATIONS.md), and [docs/DEMO.md](docs/DEMO.md).
