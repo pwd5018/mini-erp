@@ -89,12 +89,19 @@ export class TestAgentModel implements AgentModel {
     const productIds = [...new Set((orders ?? []).flatMap((order) => order.lineItems.map((line) => line.productId)))];
     const missing = productIds.filter((productId) => !knownProducts.has(productId));
     if (missing.length) return { type: "tool_calls", toolCalls: missing.map((productId) => ({ callId: `test-inventory-${productId}`, name: "get_inventory", arguments: { productId } })) };
-    return { type: "final", text: "The evidence has been collected. No write action was executed." };
+    const inventoryByProduct = new Map<string, number>();
+    for (const item of input.evidence.filter((entry) => entry.toolName === "get_inventory")) {
+      const records = Array.isArray(item.result) ? item.result as Inventory[] : [];
+      if (records.length) inventoryByProduct.set(records[0].productId, records.reduce((total, record) => total + record.available, 0));
+    }
+    const findings = findAtRiskLines(orders ?? [], inventoryByProduct);
+    if (!findings.length) return { type: "final", text: "No open order shortages were found. No write action was executed." };
+    return { type: "final", text: findings.map((finding) => `${finding.orderId} is at risk because ${finding.quantityRequired} units of ${finding.productId} are required but only ${finding.availableInventory} are available, creating a shortage of ${finding.shortage}.`).join(" ") + " Recommended action: create a replenishment request for the shortage. No write action was executed by the read-only analysis stage." };
   }
 
   async summarize(input: { request: string; evidence: AgentEvidence[]; findings: unknown }): Promise<string> {
     const findings = input.findings as AtRiskLine[];
     if (!findings.length) return "No open order shortages were found. No write action was executed.";
-    return findings.map((finding) => `${finding.orderId} is at risk: ${finding.quantityRequired} required, ${finding.availableInventory} available, shortage ${calculateShortage(finding.quantityRequired, finding.availableInventory)}.`).join(" ") + " No write action was executed.";
+    return findings.map((finding) => `${finding.orderId} is at risk because ${finding.quantityRequired} units of ${finding.productId} are required but only ${finding.availableInventory} are available, creating a shortage of ${calculateShortage(finding.quantityRequired, finding.availableInventory)}.`).join(" ") + " Recommended action: create a replenishment request for the shortage. No write action was executed by the read-only analysis stage.";
   }
 }

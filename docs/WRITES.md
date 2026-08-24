@@ -36,4 +36,4 @@ Before proposal and again before execution, the service verifies:
 
 The final replenishment insert and action completion update occur in one SQLite transaction.
 
-Phase 5 is tested through the real MCP client/server in `tests/writes.test.ts`. The OpenAI agent still receives only read tools until a later phase explicitly adds a safe write-planning and approval UI flow.
+Phase 5 is tested through the real MCP client/server in `tests/writes.test.ts`. The complete local demonstration composes the read-only agent with this write server in `src/workflow/endToEnd.ts`; the OpenAI production provider still receives only read tools, while the deterministic demo performs the explicit proposal and approval steps outside the model.

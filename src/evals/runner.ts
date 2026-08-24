@@ -3,6 +3,7 @@ import { AgentOrchestrator } from "../agent/orchestrator.js";
 import { createEmbeddedMcpClient } from "../agent/mcpClient.js";
 import type { EvalScenario } from "./scenarios.js";
 import type { EvaluationReport, EvaluationResult, EvalCategory } from "./types.js";
+import { runEndToEndEvaluation } from "./endToEnd.js";
 
 export async function runScenario(scenario: EvalScenario): Promise<EvaluationResult> {
   let db;
@@ -24,6 +25,7 @@ export async function runScenario(scenario: EvalScenario): Promise<EvaluationRes
 export async function runEvaluations(scenarios: EvalScenario[]): Promise<EvaluationReport> {
   const results: EvaluationResult[] = [];
   for (const scenario of scenarios) results.push(await runScenario(scenario));
+  results.push(await runEndToEndEvaluation());
   const categories: EvalCategory[] = ["intent", "toolSelection", "toolArguments", "grounding", "hallucination", "authorization", "safeExecution", "businessOutcome"];
   const passed = results.filter((result) => result.passed).length;
   const categoryPassRates = Object.fromEntries(categories.map((category) => [category, results.length ? Math.round(results.reduce((total, result) => total + result.scores[category], 0) / results.length * 100) : 0])) as EvaluationReport["categoryPassRates"];

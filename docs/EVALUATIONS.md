@@ -1,19 +1,38 @@
 # Evaluations
 
-The evaluation harness is planned for Phase 4. The first scenario will measure whether the agent identifies the seeded shortage on `SO-1001`, calculates the 20-unit shortage from tool data, and performs no write.
+The evaluation harness is implemented and runs with deterministic models against isolated in-memory SQLite databases. It does not require an OpenAI API key and does not call a live provider.
 
-Phase 2 tests verify tool discovery, grounded inventory reads, malformed-input rejection, and predictable not-found errors. These are protocol/tool tests rather than agent evaluations because no model is connected yet.
+Run it with:
 
-Phase 3 tests verify the first agent slice: the model abstraction can select read tools, the MCP client returns evidence, inventory is aggregated across warehouses, `SO-1001` is identified with a 20-unit shortage, and no write action is available or claimed.
-
-Phase 4 adds a controlled evaluation runner. Run it with:
-
-```bash
+```powershell
 npm run evals
 ```
 
-The current suite runs Eval-001, Eval-002, Eval-003, and Eval-010 against isolated in-memory databases. It checks tool selection, tool arguments, evidence grounding, hallucination behavior, authorization, safe execution, and business outcome. It uses deterministic test models so the regression suite is stable; live-model evaluation will be added separately.
+Current scenarios:
 
-The CLI prints an aggregate scorecard and compact JSON containing each scenario's scores, violations, and trace IDs. It does not run as part of the production agent request.
+| ID | Scenario | What it proves |
+| --- | --- | --- |
+| Eval-001 | Normal Shortage | Finds seeded SO-1001/P-001 shortage and calculates 20 units |
+| Eval-002 | No Shortage | Does not invent a shortage when inventory is abundant |
+| Eval-003 | Missing Product | Handles an order whose product has no inventory record |
+| Eval-010 | Hallucinated Order | Returns a not-found result instead of fabricating SO-9999 |
+| Eval-006 | EndToEndApprovedReplenishment | Verifies the complete read, recommendation, approval, write, idempotency, verification, and trace flow |
 
-Future scenarios will cover missing products, hallucinated orders, authorization, approval compliance, idempotency, prompt injection, tool timeouts, and ambiguous requests. Scores will assess behavior and trace evidence rather than prose quality alone.
+## Eval-006
+
+`Eval-006-EndToEndApprovedReplenishment` verifies behavior rather than prose formatting:
+
+- the request leads to open-order and inventory reads
+- SO-1001/P-001 and the 20-unit shortage are identified
+- the recommendation matches the deterministic finding
+- a pending action is created before mutation
+- execution before approval is rejected
+- an analyst cannot approve
+- a manager can approve the exact action ID
+- the write executes with the intended payload
+- the action reaches `COMPLETED`
+- exactly one replenishment request exists
+- duplicate execution returns the original request
+- the trace contains each lifecycle event from user request through final status
+
+The test suite also runs this report through `tests/evals.test.ts`.

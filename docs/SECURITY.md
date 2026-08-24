@@ -11,3 +11,5 @@ Phase 5 keeps write authorization outside the model. Actor roles are supplied by
 The current role model is deliberately a demo. It does not integrate with SSO or an employee directory because enterprise identity is outside this project's demonstration scope. The relevant concepts are represented locally through application-supplied actor roles and approval checks.
 
 The demonstration focus is deterministic role checks outside the model, explicit structured approvals for every write, strict Zod input schemas, record existence checks, idempotency keys, prompt-injection resistance, and verification after uncertain transactions.
+
+The end-to-end demo also treats ERP text as untrusted data. The agent instructions explicitly ignore instructions embedded in order notes and descriptions, and the deterministic application layer does not derive authorization or write arguments from those fields. The write MCP schemas reject extra fields, including attempts to smuggle instructions into a mutation call.

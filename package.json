@@ -9,6 +9,7 @@
     "db:seed": "tsx src/seed.ts",
     "mcp:stdio": "tsx src/mcp/stdio.ts",
     "agent": "tsx src/agent/cli.ts",
+    "demo": "tsx src/demo/cli.ts",
     "evals": "tsx src/evals/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest"

@@ -10,12 +10,16 @@ Phase 4 adds the controlled evaluation harness. It runs deterministic scenarios 
 
 Phase 5 adds a separate write MCP server. `propose_replenishment_request` creates a pending action, `approve_action` requires an Operations Manager, and `create_replenishment_request` requires that exact action to be approved. The action record and replenishment insert are persisted with an idempotency key and transaction-safe completion state.
 
+The completed end-to-end demonstration composes these boundaries in `src/workflow/endToEnd.ts`. It uses the read-only agent orchestrator to collect evidence, applies deterministic shortage logic, creates a structured recommendation, proposes through the write MCP server as an analyst, demonstrates blocked execution and blocked analyst approval, approves as a manager, executes the exact action, repeats execution to prove idempotency, and verifies the resulting action and replenishment records through MCP reads.
+
 Planned flow:
 
 ```text
 User -> Agent orchestrator -> typed MCP read tools -> repositories -> SQLite
-                         -> policy/approval gate -> typed write tools
-                         -> trace and audit store
+                         -> deterministic findings -> structured recommendation
+                         -> pending action -> manager approval
+                         -> typed write tool -> transaction -> verification
+                         -> trace and audit summary
 ```
 
-The next planned boundary is a compact local approval walkthrough and stronger demonstration evaluations. This project intentionally stops short of commercial ERP integration, SSO, and production infrastructure. The application will never delegate security or core ERP calculations to the model.
+The next work is portfolio polish and additional targeted failure scenarios. This project intentionally stops short of commercial ERP integration, SSO, and production infrastructure. The application will never delegate security or core ERP calculations to the model.

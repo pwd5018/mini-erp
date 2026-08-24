@@ -18,6 +18,8 @@ The current slice uses a small TypeScript project with three boundaries. SQLite 
 
 The current repository also contains read-only MCP tools, a read-only OpenAI agent, an evaluation harness, and a separately tested approval-gated write MCP server. The demo uses SQLite by design. It is intended to showcase engineering concepts, not integrate with a commercial ERP or become a production service.
 
+The primary demonstration is the complete approved replenishment workflow. It uses the deterministic test agent, so `npm run demo` does not require an OpenAI API key.
+
 ## Run locally
 
 ```bash
@@ -25,6 +27,8 @@ npm install
 npm run db:seed
 npm test
 npm run build
+npm run evals
+npm run demo
 ```
 
 The seed command creates `data/mini-erp.db`, which is intentionally ignored by Git.
@@ -39,7 +43,8 @@ The seed command creates `data/mini-erp.db`, which is intentionally ignored by G
 - Read-only agent orchestrator and model-provider abstraction: complete
 - Controlled evaluation harness: complete
 - Approval-gated, idempotent replenishment write service: complete
-- Compact approval walkthrough, stronger demo policies, prompt-injection evaluations, and trace presentation: pending
+- One polished end-to-end shortage-to-approved-replenishment flow: complete
+- Broader prompt-injection and policy scenarios: future polish
 
 The project specifically demonstrates MCP tools, agent orchestration, ERP-style workflows, human approval gates, evals, safe execution, idempotency, prompt-injection resistance, and observability/tracing. Enterprise identity, real ERP integration, email infrastructure, and production deployment are out of scope.
 

@@ -100,20 +100,22 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 
 ## Next milestones
 
-### Phase 6 — Demonstration approval experience — pending
+### Phase 6 — One polished end-to-end enterprise agent flow — complete
 
-- Small local approval inbox or CLI approval walkthrough for pending actions
-- Detail view showing the proposed change and supporting evidence
-- Approve and reject actions
-- Approval history and rejection reasons
-- Tests for authorization, stale actions, and duplicate clicks
+- Shortage analysis through the read-only agent and MCP tools
+- Deterministic finding and structured replenishment recommendation
+- Pending action creation through the write MCP server
+- Explicit analyst and manager authorization behavior
+- Approval, idempotent execution, and final transaction verification
+- Concise lifecycle trace summary
+- `Eval-006-EndToEndApprovedReplenishment`
+- `npm run demo` entry point
 
-### Phase 7 — Demonstration hardening — pending
+### Phase 7 — Portfolio polish — pending
 
-- Improve the local demo role model enough to show separation of duties
-- Add explicit policy examples and failure cases
-- Expand prompt-injection and unsafe-tool evaluation scenarios
-- Add a concise trace viewer or trace report
+- Improve demo presentation and README walkthrough
+- Add a small number of high-value prompt-injection and policy failure cases
+- Add a concise trace artifact if useful for the submission
 
 ## Out of scope
 
@@ -126,7 +128,7 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 
 ## Explicitly not complete yet
 
-- There is no browser approval UI yet; approval is currently demonstrated through the write MCP tests.
+- There is no browser approval UI; approval is demonstrated through the polished CLI flow and MCP integration tests.
 - There is no email notification flow, and none is required for the demonstration target.
 - The role model is intentionally local and simplified.
 - The OpenAI agent is still read-only; write execution is exposed through the separately tested write server.
@@ -143,6 +145,7 @@ npm run db:seed
 npm test
 npm run build
 npm run evals
+npm run demo
 ```
 
 For the live read-only agent, copy `.env.example` to `.env`, set `OPENAI_API_KEY` and `OPENAI_MODEL`, seed the database, and run:
