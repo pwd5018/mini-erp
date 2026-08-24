@@ -52,6 +52,17 @@ npm run demo
 
 The demo uses the real in-memory MCP client/server boundary for both reads and writes. It does not expose write tools to the OpenAI production agent; the explicit approval workflow is application-controlled.
 
+## Browser approval console
+
+For a visual walkthrough, start the local approval console after seeding:
+
+```powershell
+npm run db:seed
+npm run ui
+```
+
+Open [http://127.0.0.1:8787](http://127.0.0.1:8787). Click `Run agent analysis`, then `Approve as Operations Manager`, then `Execute approved action`. The page shows the recommendation, action state, final request ID, duplicate-execution result, and lifecycle trace. Use `npm run ui:live` instead of `npm run ui` to use the OpenAI agent for the analysis stage.
+
 ## Live OpenAI agent variant
 
 The same end-to-end flow can use the OpenAI agent for the intent and read-tool planning stage:

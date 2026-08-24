@@ -111,6 +111,7 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 - `Eval-006-EndToEndApprovedReplenishment`
 - `npm run demo` entry point
 - `npm run demo:live` provider-backed variant using the same safety controls
+- `npm run ui` local browser approval console
 
 ### Phase 7 — Portfolio polish — pending
 

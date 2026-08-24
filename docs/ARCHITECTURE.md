@@ -12,6 +12,8 @@ Phase 5 adds a separate write MCP server. `propose_replenishment_request` create
 
 The completed end-to-end demonstration composes these boundaries in `src/workflow/endToEnd.ts`. It uses the read-only agent orchestrator to collect evidence, applies deterministic shortage logic, creates a structured recommendation, proposes through the write MCP server as an analyst, demonstrates blocked execution and blocked analyst approval, approves as a manager, executes the exact action, repeats execution to prove idempotency, and verifies the resulting action and replenishment records through MCP reads.
 
+The small browser approval console in `src/ui/` exposes the same staged operations over local HTTP. It is a demonstration surface only: it does not bypass MCP, application authorization, or transaction verification.
+
 Planned flow:
 
 ```text
