@@ -18,7 +18,7 @@ Grounded response
 
 `AgentModel` is the provider boundary. `OpenAIModel` uses the OpenAI Responses API and function calling. It receives the read-tool catalog, can request tool calls, and then receives the returned evidence. The system prompt explicitly treats ERP text as untrusted data and tells the model not to invent identifiers or claim writes.
 
-`AgentOrchestrator` enforces limits of three reasoning rounds and 32 tool calls. It only allows names from the read-tool catalog. It uses `findAtRiskLines` for shortage truth instead of asking the model to perform arithmetic.
+`AgentOrchestrator` enforces limits of three reasoning rounds and 32 tool calls. It only allows names from the read-tool catalog. It calculates shortages deterministically and records missing inventory as an explicit insufficient-data result rather than treating it as safe inventory.
 
 ## Run
 

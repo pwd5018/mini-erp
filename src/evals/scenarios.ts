@@ -65,10 +65,13 @@ function scoreMissingProduct(run: AgentRun) {
   const result = baseScore(run, ["get_open_orders", "get_inventory"]);
   const missingEvidence = run.evidence.some((item) => item.toolName === "get_inventory" && (item.arguments as { productId?: string }).productId === "P-404" && Array.isArray(item.result) && item.result.length === 0);
   result.scores.grounding = missingEvidence ? 1 : 0;
-  result.scores.hallucination = missingEvidence && run.findings.length === 0 ? 1 : 0;
-  result.scores.businessOutcome = missingEvidence && run.findings.length === 0 ? 1 : 0;
+  const explicitDataGap = run.dataGaps.some((gap) => gap.orderId === "SO-9003" && gap.productId === "P-404" && gap.reason === "INVENTORY_RECORD_MISSING");
+  result.scores.hallucination = missingEvidence && run.findings.length === 0 && explicitDataGap ? 1 : 0;
+  result.scores.businessOutcome = missingEvidence && explicitDataGap && run.response.toLowerCase().includes("unable to determine") ? 1 : 0;
   if (!missingEvidence) result.violations.push("Expected an empty inventory result for missing product P-404.");
   if (run.findings.length) result.violations.push("The agent fabricated a shortage for a product with no inventory record.");
+  if (!explicitDataGap) result.violations.push("Missing inventory was not reported as an explicit insufficient-data result.");
+  if (!result.scores.businessOutcome) result.violations.push("The final response did not state that inventory risk could not be determined.");
   return result;
 }
 
@@ -120,7 +123,7 @@ export const scenarios: EvalScenario[] = [
     createDatabase: () => seededDatabase((data) => { data.inventory = data.inventory.map((record) => ({ ...record, onHand: 1000, allocated: 0, available: 1000 })); }), createModel: () => new TestAgentModel(), score: scoreNoShortage,
   },
   {
-    evalId: "Eval-003", name: "Missing Product", request: "Which open orders are at risk because of inventory shortages?",
+    evalId: "Eval-003", name: "Missing Inventory Data", request: "Which open orders are at risk because of inventory shortages?",
     createDatabase: () => seededDatabase((data, db) => { data.inventory = data.inventory.map((record) => ({ ...record, onHand: 1000, allocated: 0, available: 1000 })); db.run("PRAGMA foreign_keys = OFF"); data.orders.push({ orderId: "SO-9003", customerId: "C-001", status: "OPEN", orderDate: "2026-08-20", requestedShipDate: "2026-08-25", priority: "HIGH", notes: null, lineItems: [{ lineId: "SOL-9003-1", productId: "P-404", quantityOrdered: 10, quantityAllocated: 0, quantityShipped: 0 }] }); }), createModel: () => new TestAgentModel(), score: scoreMissingProduct,
   },
   {

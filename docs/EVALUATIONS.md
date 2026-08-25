@@ -1,6 +1,6 @@
 # Evaluations
 
-The evaluation harness is implemented and runs with deterministic models against isolated in-memory SQLite databases. It does not require an OpenAI API key and does not call a live provider.
+The evaluation harness is implemented and runs with deterministic models against isolated in-memory SQLite databases. It does not require an OpenAI API key and does not call a live provider. A 100% result means all six controlled deterministic scenarios passed; it is not a statistical benchmark of the live OpenAI provider.
 
 Run it with:
 
@@ -14,7 +14,7 @@ Current scenarios:
 | --- | --- | --- |
 | Eval-001 | Normal Shortage | Finds seeded SO-1001/P-001 shortage and calculates 20 units |
 | Eval-002 | No Shortage | Does not invent a shortage when inventory is abundant |
-| Eval-003 | Missing Product | Handles an order whose product has no inventory record |
+| Eval-003 | Missing Inventory Data | Reports an explicit insufficient-data result when an open-order line has no inventory record |
 | Eval-010 | Hallucinated Order | Returns a not-found result instead of fabricating SO-9999 |
 | Eval-011 | Prompt Injection in ERP Note | Ignores malicious instructions embedded in enterprise text |
 | Eval-006 | EndToEndApprovedReplenishment | Verifies the complete read, recommendation, approval, write, idempotency, verification, and trace flow |
@@ -35,5 +35,9 @@ Current scenarios:
 - exactly one replenishment request exists
 - duplicate execution returns the original request
 - the trace contains each lifecycle event from user request through final status
+
+## Live-provider boundary
+
+The live OpenAI path is exercised through `npm run demo:live` and `npm run ui:live`. It is deliberately kept outside the deterministic regression suite so tests are repeatable, fast, and API-key-free. The live path uses the same MCP, validation, approval, write, and verification boundaries, but its model behavior is not statistically benchmarked by this repository.
 
 The test suite also runs this report through `tests/evals.test.ts`.

@@ -56,6 +56,9 @@ describe("Phase 5 approval-gated writes", () => {
 
     const duplicateProposal = await analyst.client.callTool({ name: "propose_replenishment_request", arguments: input });
     expect(dataOf<{ actionId: string }>(duplicateProposal).actionId).toBe(action.actionId);
+    const conflictingProposal = await analyst.client.callTool({ name: "propose_replenishment_request", arguments: { ...input, quantity: 21 } });
+    expect(conflictingProposal.isError).toBe(true);
+    expect(textOf(conflictingProposal)).toContain("CONFLICT");
     const duplicateExecution = await manager.client.callTool({ name: "create_replenishment_request", arguments: { actionId: action.actionId } });
     expect(dataOf<{ replenishmentRequest: { requestId: string } }>(duplicateExecution).replenishmentRequest.requestId).toBe(firstRequest.requestId);
     expect(getReplenishmentRequests(db, "P-001", "PENDING")).toHaveLength(1);

@@ -61,4 +61,4 @@ FINAL_STATUS
 
 ## Evaluation result
 
-The controlled suite passes all six scenarios, including `Eval-006-EndToEndApprovedReplenishment` and `Eval-011 Prompt Injection in ERP Note`, with a 100% pass rate.
+The controlled deterministic suite passes all six scenarios, including `Eval-006-EndToEndApprovedReplenishment` and `Eval-011 Prompt Injection in ERP Note`, with a 100% pass rate. This result does not statistically benchmark live OpenAI-provider behavior.

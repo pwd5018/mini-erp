@@ -4,7 +4,7 @@ The system starts with a deterministic foundation. SQLite is accessed through a 
 
 The read-only MCP server in `src/mcp/readServer.ts` registers six tools over the repository boundary: open orders, one order, inventory, customers, suppliers, and replenishment requests. `src/mcp/stdio.ts` exposes the server over MCP stdio for a compatible host. The server validates inputs before running repository reads and records every attempt through `TraceRecorder`.
 
-The agent orchestrator in `src/agent/orchestrator.ts` accepts a user request, asks an `AgentModel` which read tools are needed, calls those tools through an MCP client, applies the deterministic shortage service, and returns a grounded read-only answer. It has bounded rounds and tool-call limits. `OpenAIModel` is the live provider adapter; the deterministic test model makes automated tests repeatable.
+The agent orchestrator in `src/agent/orchestrator.ts` accepts a user request, asks an `AgentModel` which read tools are needed, calls those tools through an MCP client, applies deterministic inventory assessment, and returns a grounded read-only answer. A missing inventory record becomes an explicit insufficient-data result, not an implicit no-shortage result. It has bounded rounds and tool-call limits. `OpenAIModel` is the live provider adapter; the deterministic test model makes automated tests repeatable.
 
 The controlled evaluation harness runs scenarios through the real MCP client/server path and scores tool use, grounding, hallucination resistance, authorization, safe execution, and business outcome.
 

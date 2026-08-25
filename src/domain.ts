@@ -101,17 +101,40 @@ export interface AtRiskLine {
   requestedShipDate: string;
 }
 
+export interface InventoryDataGap {
+  orderId: string;
+  lineId: string;
+  productId: string;
+  quantityRequired: number;
+  requestedShipDate: string;
+  reason: "INVENTORY_RECORD_MISSING";
+}
+
+export interface InventoryAssessment {
+  atRiskLines: AtRiskLine[];
+  dataGaps: InventoryDataGap[];
+}
+
 export function calculateShortage(quantityRequired: number, availableInventory: number): number {
   return Math.max(0, quantityRequired - availableInventory);
 }
 
 export function findAtRiskLines(orders: SalesOrder[], inventoryByProduct: Map<string, number>): AtRiskLine[] {
-  return orders.flatMap((order) => order.lineItems.flatMap((line) => {
+  return assessInventoryAvailability(orders, inventoryByProduct).atRiskLines;
+}
+
+export function assessInventoryAvailability(orders: SalesOrder[], inventoryByProduct: Map<string, number>): InventoryAssessment {
+  const atRiskLines: AtRiskLine[] = [];
+  const dataGaps: InventoryDataGap[] = [];
+  for (const order of orders) for (const line of order.lineItems) {
     const quantityRequired = line.quantityOrdered - line.quantityAllocated - line.quantityShipped;
     const availableInventory = inventoryByProduct.get(line.productId);
-    if (availableInventory === undefined) return [];
+    if (availableInventory === undefined) {
+      dataGaps.push({ orderId: order.orderId, lineId: line.lineId, productId: line.productId, quantityRequired, requestedShipDate: order.requestedShipDate, reason: "INVENTORY_RECORD_MISSING" });
+      continue;
+    }
     const shortage = calculateShortage(quantityRequired, availableInventory);
-    return shortage > 0 ? [{
+    if (shortage > 0) atRiskLines.push({
       orderId: order.orderId,
       lineId: line.lineId,
       productId: line.productId,
@@ -119,6 +142,7 @@ export function findAtRiskLines(orders: SalesOrder[], inventoryByProduct: Map<st
       availableInventory,
       shortage,
       requestedShipDate: order.requestedShipDate,
-    }] : [];
-  }));
+    });
+  }
+  return { atRiskLines, dataGaps };
 }

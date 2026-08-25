@@ -6,7 +6,7 @@ The read MCP server is read-only. MCP inputs use strict Zod schemas, unknown fie
 
 The live agent receives only the read-tool catalog, the orchestrator rejects tool names outside that catalog, and bounded rounds/tool calls prevent an unending tool loop. The model is not trusted to calculate shortage truth or authorize mutations.
 
-Write authorization stays outside the model. Actor roles are supplied by the application context, not by tool arguments. Analysts may propose but cannot approve or execute. Managers must approve an exact action ID, and execution revalidates the product and linked order. Idempotency keys and a transaction prevent duplicate or half-completed replenishment writes.
+Write authorization stays outside the model. Actor roles are supplied by the application context, not by tool arguments. Analysts may propose but cannot approve or execute. Managers must approve an exact action ID, and execution revalidates the product and linked order. The local transaction prevents half-completed writes, and idempotency protects the demonstrated sequential retry path.
 
 The current role model is deliberately a demo. It does not integrate with SSO or an employee directory because enterprise identity is outside this project's demonstration scope. The relevant concepts are represented locally through application-supplied actor roles and approval checks.
 

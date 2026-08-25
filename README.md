@@ -1,5 +1,7 @@
 # AI-First Mini ERP
 
+[![CI](https://github.com/pwd5018/mini-erp/actions/workflows/ci.yml/badge.svg)](https://github.com/pwd5018/mini-erp/actions/workflows/ci.yml)
+
 An interview-ready demonstration of a safe AI operations agent. The assistant gathers evidence through typed MCP tools, produces grounded findings, and uses approval gates before business mutations.
 
 ## Design principles
@@ -22,6 +24,10 @@ The current repository also contains read-only MCP tools, a read-only OpenAI age
 
 The primary demonstration is the complete approved replenishment workflow. `npm run demo` uses the deterministic test agent and does not require an OpenAI API key. `npm run demo:live` runs the same flow with the OpenAI agent for live intent and read-tool planning.
 
+## Evaluation scope
+
+`npm run evals` reports a 100% pass rate only for the six controlled scenarios that use deterministic test models and isolated in-memory databases. The live OpenAI path is demonstrated manually through `npm run demo:live` and `npm run ui:live`; it is not statistically benchmarked or used as a provider-backed regression suite.
+
 ## Run locally
 
 ```bash
@@ -37,11 +43,16 @@ The seed command creates `data/mini-erp.db`, which is intentionally ignored by G
 
 The browser demo also manages this local file: it resets from the canonical seed data at startup and persists its pending action, approval, and replenishment writes after each successful UI step. This is for inspection during the demonstration only; restarting the UI resets the demo database again.
 
+## License
+
+Released under the [MIT License](LICENSE).
+
 ## Status
 
 - Application foundation and TypeScript build: complete
 - Seeded SQLite database: complete
 - Deterministic shortage service: complete
+- Explicit insufficient-inventory-data handling: complete
 - Domain and database tests: complete
 - Read-only MCP tools and tool-call traces: complete
 - Read-only agent orchestrator and model-provider abstraction: complete

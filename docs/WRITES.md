@@ -22,7 +22,9 @@ The actor role comes from the application-created `ActorContext`, not from tool 
 
 ## Idempotency
 
-Every proposal requires an idempotency key. Repeating the proposal returns the original action. Repeating execution after completion returns the original replenishment request instead of inserting a duplicate.
+Every proposal requires an idempotency key. Repeating the same proposal returns the original action; reusing a key with different replenishment details is rejected as a conflict. Repeating execution after completion returns the original replenishment request instead of inserting a duplicate.
+
+This is a single-process demonstration using local `sql.js`. It proves retry safety for the demonstrated sequential workflow, but it is not presented as a distributed-concurrency solution. A production ERP integration would use an atomic execution claim and an ERP- or database-enforced idempotency constraint.
 
 ## Validation
 

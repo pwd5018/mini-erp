@@ -15,7 +15,10 @@ export class ReplenishmentActionService {
 
   propose(actor: ActorContext, payload: ReplenishmentPayload): AgentAction {
     const existing = getAgentActionByIdempotencyKey(this.db, payload.idempotencyKey);
-    if (existing) return existing;
+    if (existing) {
+      if (!this.samePayload(existing.payload, payload)) throw new ToolError("CONFLICT", `Idempotency key ${payload.idempotencyKey} was already used with different replenishment details.`);
+      return existing;
+    }
     this.validatePayload(payload);
     const action: AgentAction = {
       actionId: `ACT-${randomUUID()}`,
@@ -97,6 +100,13 @@ export class ReplenishmentActionService {
 
   private requireManager(actor: ActorContext): void {
     if (actor.role !== "OPERATIONS_MANAGER") throw new ToolError("FORBIDDEN", "Operations Manager approval is required for this action.");
+  }
+
+  private samePayload(existing: ReplenishmentPayload, candidate: ReplenishmentPayload): boolean {
+    return existing.productId === candidate.productId
+      && existing.quantity === candidate.quantity
+      && existing.reason === candidate.reason
+      && existing.linkedOrderId === candidate.linkedOrderId;
   }
 
   private requireAction(actionId: string): AgentAction {

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { calculateShortage, findAtRiskLines, type AtRiskLine, type Inventory, type SalesOrder } from "../domain.js";
+import { assessInventoryAvailability, calculateShortage, findAtRiskLines, type AtRiskLine, type Inventory, type InventoryAssessment, type InventoryDataGap, type SalesOrder } from "../domain.js";
 import { readToolDefinitions } from "../mcp/catalog.js";
 import type { ReadToolName } from "../mcp/readServer.js";
 import type { AgentEvidence, AgentModel } from "./model.js";
@@ -11,6 +11,7 @@ export interface AgentRun {
   response: string;
   evidence: AgentEvidence[];
   findings: AtRiskLine[];
+  dataGaps: InventoryDataGap[];
   toolCalls: Array<{ name: string; arguments: unknown; traceId?: string }>;
   rounds: number;
 }
@@ -40,7 +41,8 @@ export class AgentOrchestrator {
       rounds += 1;
       const decision = await this.model.decide({ request, evidence, tools: readToolDefinitions });
       if (decision.type === "final") {
-        return { sessionId, request, response: decision.text, evidence, findings: this.findings(evidence), toolCalls, rounds };
+        const assessment = this.assessment(evidence);
+        return { sessionId, request, response: this.withDataGapNotice(decision.text, assessment.dataGaps), evidence, findings: assessment.atRiskLines, dataGaps: assessment.dataGaps, toolCalls, rounds };
       }
       if (decision.toolCalls.length === 0) throw new Error("The agent requested no tools and produced no answer.");
       for (const call of decision.toolCalls) {
@@ -56,12 +58,12 @@ export class AgentOrchestrator {
       }
     }
 
-    const findings = this.findings(evidence);
-    const response = await this.model.summarize({ request, evidence, findings });
-    return { sessionId, request, response, evidence, findings, toolCalls, rounds };
+    const assessment = this.assessment(evidence);
+    const response = await this.model.summarize({ request, evidence, findings: assessment });
+    return { sessionId, request, response: this.withDataGapNotice(response, assessment.dataGaps), evidence, findings: assessment.atRiskLines, dataGaps: assessment.dataGaps, toolCalls, rounds };
   }
 
-  private findings(evidence: AgentEvidence[]): AtRiskLine[] {
+  private assessment(evidence: AgentEvidence[]): InventoryAssessment {
     const orders = evidence.filter((item) => item.toolName === "get_open_orders" || item.toolName === "get_order").flatMap((item) => this.asOrders(item.result));
     const inventoryByProduct = new Map<string, number>();
     for (const item of evidence.filter((entry) => entry.toolName === "get_inventory")) {
@@ -70,14 +72,23 @@ export class AgentOrchestrator {
       const productId = records[0].productId;
       inventoryByProduct.set(productId, records.reduce((total, record) => total + record.available, 0));
     }
+    const assessed = assessInventoryAvailability(orders, inventoryByProduct);
     const uniqueFindings = new Map<string, AtRiskLine>();
-    for (const finding of findAtRiskLines(orders, inventoryByProduct)) uniqueFindings.set(`${finding.orderId}:${finding.lineId}:${finding.productId}`, finding);
-    return [...uniqueFindings.values()];
+    for (const finding of assessed.atRiskLines) uniqueFindings.set(`${finding.orderId}:${finding.lineId}:${finding.productId}`, finding);
+    const uniqueDataGaps = new Map<string, InventoryDataGap>();
+    for (const dataGap of assessed.dataGaps) uniqueDataGaps.set(`${dataGap.orderId}:${dataGap.lineId}:${dataGap.productId}`, dataGap);
+    return { atRiskLines: [...uniqueFindings.values()], dataGaps: [...uniqueDataGaps.values()] };
   }
 
   private asOrders(result: unknown): SalesOrder[] {
     if (Array.isArray(result)) return result as SalesOrder[];
     return result ? [result as SalesOrder] : [];
+  }
+
+  private withDataGapNotice(response: string, dataGaps: InventoryDataGap[]): string {
+    if (!dataGaps.length || response.toLowerCase().includes("unable to determine")) return response;
+    const affectedLines = dataGaps.map((gap) => `${gap.orderId}/${gap.productId}`).join(", ");
+    return `${response} Unable to determine inventory risk for ${affectedLines} because no inventory record was returned. No replenishment action is proposed for incomplete inventory data.`;
   }
 }
 
@@ -94,13 +105,17 @@ export class TestAgentModel implements AgentModel {
       const records = Array.isArray(item.result) ? item.result as Inventory[] : [];
       if (records.length) inventoryByProduct.set(records[0].productId, records.reduce((total, record) => total + record.available, 0));
     }
-    const findings = findAtRiskLines(orders ?? [], inventoryByProduct);
+    const assessment = assessInventoryAvailability(orders ?? [], inventoryByProduct);
+    const findings = assessment.atRiskLines;
+    if (!findings.length && assessment.dataGaps.length) return { type: "final", text: "Unable to determine inventory risk for one or more open-order lines because no inventory record was returned. No write action was executed." };
     if (!findings.length) return { type: "final", text: "No open order shortages were found. No write action was executed." };
     return { type: "final", text: findings.map((finding) => `${finding.orderId} is at risk because ${finding.quantityRequired} units of ${finding.productId} are required but only ${finding.availableInventory} are available, creating a shortage of ${finding.shortage}.`).join(" ") + " Recommended action: create a replenishment request for the shortage. No write action was executed by the read-only analysis stage." };
   }
 
   async summarize(input: { request: string; evidence: AgentEvidence[]; findings: unknown }): Promise<string> {
-    const findings = input.findings as AtRiskLine[];
+    const assessment = input.findings as InventoryAssessment;
+    const findings = assessment.atRiskLines ?? input.findings as AtRiskLine[];
+    if (!findings.length && assessment.dataGaps?.length) return "Unable to determine inventory risk for one or more open-order lines because no inventory record was returned. No write action was executed.";
     if (!findings.length) return "No open order shortages were found. No write action was executed.";
     return findings.map((finding) => `${finding.orderId} is at risk because ${finding.quantityRequired} units of ${finding.productId} are required but only ${finding.availableInventory} are available, creating a shortage of ${calculateShortage(finding.quantityRequired, finding.availableInventory)}.`).join(" ") + " Recommended action: create a replenishment request for the shortage. No write action was executed by the read-only analysis stage.";
   }
