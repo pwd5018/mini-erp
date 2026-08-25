@@ -75,3 +75,5 @@ npm run demo:live
 ```
 
 In live mode, OpenAI selects only the read MCP tools. The application still performs the deterministic shortage calculation, creates the structured recommendation, enforces analyst/manager authorization, executes the write MCP tool, verifies the transaction, and prints the trace. This preserves the safety boundary while demonstrating the real provider path.
+
+See [INTERVIEW_WALKTHROUGH.md](INTERVIEW_WALKTHROUGH.md) for the recommended presentation order and [examples/end-to-end-run.md](examples/end-to-end-run.md) for representative output.

@@ -21,6 +21,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "POST" && request.url === "/api/execute") return sendJson(response, await session.execute());
     sendJson(response, { error: "Not found" }, 404);
   } catch (error) {
+    console.error("UI request failed:", error);
     sendJson(response, { error: error instanceof Error ? error.message : String(error) }, 400);
   }
 });

@@ -113,11 +113,12 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 - `npm run demo:live` provider-backed variant using the same safety controls
 - `npm run ui` local browser approval console
 
-### Phase 7 — Portfolio polish — pending
+### Phase 7 — Portfolio polish — complete
 
-- Improve demo presentation and README walkthrough
-- Add a small number of high-value prompt-injection and policy failure cases
-- Add a concise trace artifact if useful for the submission
+- Live UI progress and timeout feedback
+- Saved trace/evaluation artifact
+- Interview-focused technical walkthrough
+- Targeted prompt-injection evaluation
 
 ## Out of scope
 
@@ -130,7 +131,7 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 
 ## Explicitly not complete yet
 
-- There is no browser approval UI; approval is demonstrated through the polished CLI flow and MCP integration tests.
+- The browser approval UI is intentionally local and single-session; it is not a production frontend.
 - There is no email notification flow, and none is required for the demonstration target.
 - The role model is intentionally local and simplified.
 - The OpenAI agent is still read-only; write execution is exposed through the separately tested write server.
@@ -148,6 +149,7 @@ npm test
 npm run build
 npm run evals
 npm run demo
+npm run ui
 ```
 
 For the live read-only agent, copy `.env.example` to `.env`, set `OPENAI_API_KEY` and `OPENAI_MODEL`, seed the database, and run:
@@ -155,5 +157,7 @@ For the live read-only agent, copy `.env.example` to `.env`, set `OPENAI_API_KEY
 ```powershell
 npm run agent -- "Which open orders are at risk because of inventory shortages?"
 ```
+
+For the provider-backed browser flow, use `npm run ui:live` after seeding. The UI shows progress while the provider is working and surfaces API errors instead of appearing idle.
 
 The controlled evaluation suite does not use the OpenAI API and does not require `.env`.
