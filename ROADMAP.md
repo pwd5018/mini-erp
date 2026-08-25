@@ -14,7 +14,7 @@ User
      -> OpenAI model provider (intent and tool planning)
      -> MCP client
         -> Read MCP server -> ERP repositories / database
-        -> Write MCP server -> approval policy -> ERP write adapter
+        -> Write MCP server -> approval policy -> local SQLite write boundary
   -> Evidence, traces, evaluations, and audit records
 ```
 
@@ -52,9 +52,9 @@ The target Agent / Applied AI Engineer role emphasizes agents that act inside re
 
 The application does not need to reproduce Rootstock or Salesforce. Its value is demonstrating clear opinions about tool scope, grounding, failure safety, and measurement in a small system that can be run and discussed.
 
-## Milestones
+## Implemented capabilities
 
-### Phase 1 — ERP foundation — complete
+### Deterministic ERP-style foundation
 
 - TypeScript project and build pipeline
 - SQLite schema and deterministic seed data
@@ -62,7 +62,7 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 - Deterministic shortage calculation
 - Database and domain tests
 
-### Phase 2 — Read-only MCP server — complete
+### Read-only MCP server
 
 - Official MCP SDK integration
 - Six typed read tools
@@ -71,23 +71,23 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 - Trace records for tool calls
 - In-memory MCP client/server integration tests
 
-### Phase 3 — Read-only agent — complete
+### Bounded read-only agent
 
 - Provider-neutral `AgentModel` interface
 - OpenAI Responses API adapter
 - Bounded orchestration loop
 - Real MCP client/server path
 - Deterministic shortage findings
-- No production write tools exposed to the model
+- No write tools exposed to the live model
 
-### Phase 4 — Evaluation harness — complete
+### Evaluation harness
 
 - Deterministic test model, so evaluations do not require an OpenAI API key
 - Scenarios for normal shortage, no shortage, missing product, and hallucinated order
 - Checks for intent, tool selection, arguments, grounding, hallucinations, authorization, safe execution, and business outcome
 - Current controlled scenarios pass
 
-### Phase 5 — Approval-gated writes — complete
+### Approval-gated writes
 
 - Pending agent action records
 - Analyst proposal capability
@@ -96,11 +96,9 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 - Revalidation before execution
 - Idempotency protection
 - Transaction-safe replenishment insertion
-- Write MCP server kept separate from the production read-only agent
+- Write MCP server kept separate from the live read-only agent
 
-## Next milestones
-
-### Phase 6 — One polished end-to-end enterprise agent flow — complete
+### Complete end-to-end workflow
 
 - Shortage analysis through the read-only agent and MCP tools
 - Deterministic finding and structured replenishment recommendation
@@ -113,7 +111,7 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 - `npm run demo:live` provider-backed variant using the same safety controls
 - `npm run ui` local browser approval console
 
-### Phase 7 — Portfolio polish — complete
+### Submission polish
 
 - Live UI progress and timeout feedback
 - Saved trace/evaluation artifact
@@ -129,12 +127,12 @@ The application does not need to reproduce Rootstock or Salesforce. Its value is
 - Production database migrations and high availability
 - Cloud deployment, monitoring, and on-call operations
 
-## Explicitly not complete yet
+## Known boundaries
 
 - The browser approval UI is intentionally local and single-session; it is not a production frontend.
 - There is no email notification flow, and none is required for the demonstration target.
 - The role model is intentionally local and simplified.
-- The OpenAI agent is still read-only; write execution is exposed through the separately tested write server.
+- The OpenAI agent is read-only; write execution is exposed through the separately tested write server.
 - There is no real external ERP API adapter because ERP integration is outside the target scope.
 - There is no migration framework because the local database is a disposable demonstration database.
 
@@ -158,6 +156,6 @@ For the live read-only agent, copy `.env.example` to `.env`, set `OPENAI_API_KEY
 npm run agent -- "Which open orders are at risk because of inventory shortages?"
 ```
 
-For the provider-backed browser flow, use `npm run ui:live` after seeding. The UI shows progress while the provider is working and surfaces API errors instead of appearing idle.
+For the provider-backed browser flow, use `npm run ui:live`. The UI creates a clean seeded database at startup, persists the workflow to `data/mini-erp.db`, shows progress while the provider is working, and surfaces API errors instead of appearing idle.
 
 The controlled evaluation suite does not use the OpenAI API and does not require `.env`.

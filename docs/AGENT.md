@@ -1,6 +1,6 @@
-# Phase 3 first agent
+# Agent orchestration
 
-The first agent is bounded and read-only. It is not an autonomous loop with unrestricted database access.
+The agent is bounded and read-only. It is not an autonomous loop with unrestricted database access.
 
 ```text
 User request
@@ -29,4 +29,4 @@ npm run db:seed
 npm run agent -- "Which open orders are at risk because of inventory shortages?"
 ```
 
-The output includes a session ID, final response, deterministic findings, tool calls, and number of rounds. No write tools are registered in this phase.
+The output includes a session ID, final response, deterministic findings, tool calls, and number of rounds. The live OpenAI agent receives only the read-tool catalog; write execution is handled by the explicit application-controlled approval workflow.

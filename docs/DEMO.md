@@ -1,29 +1,27 @@
 # Demo
 
-Phase 1 demo:
+## Database and deterministic foundation
 
 1. Run `npm install`.
 2. Run `npm run db:seed`.
 3. Run `npm test` and `npm run build`.
 4. Explain that the seeded data contains 10 customers, 20 products, 20 orders, two warehouses, and a deterministic shortage analysis foundation.
 
-Phase 1's deterministic database foundation is complete; Phase 2 now exposes the read tools that the future agent will use.
-
-Phase 2 demo:
+## MCP read tools
 
 1. Run `npm run db:seed`.
 2. Run `npm test`.
 3. The MCP server can be started with `npm run mcp:stdio` for an MCP-compatible client.
 4. Explain that `get_inventory` returns both warehouse records for `P-001`, while invalid input and unknown order IDs return tool errors and trace events.
 
-Phase 3 demo with a real provider:
+## Agent CLI with the live provider
 
 1. Set `OPENAI_API_KEY` in the shell; optionally set `OPENAI_MODEL`.
 2. Run `npm run db:seed`.
 3. Run `npm run agent -- "Which open orders are at risk because of inventory shortages?"`.
 4. Review the response, findings, tool calls, and trace IDs printed as JSON.
 
-## Complete end-to-end demo
+## Complete end-to-end workflow
 
 The polished demonstration is deterministic and does not require an OpenAI API key:
 
@@ -50,11 +48,11 @@ npm run demo
 11. Verify the completed action and exactly one replenishment request.
 12. Print concise lifecycle events and MCP tool-trace count.
 
-The demo uses the real in-memory MCP client/server boundary for both reads and writes. It does not expose write tools to the OpenAI production agent; the explicit approval workflow is application-controlled.
+The demo uses the real in-memory MCP client/server boundary for both reads and writes. It does not expose write tools to the live OpenAI agent; the explicit approval workflow is application-controlled.
 
 ## Browser approval console
 
-For a visual walkthrough, start the local approval console:
+For a visual walkthrough, start the local approval console. It initializes its own clean seeded database, so running `npm run db:seed` first is optional:
 
 ```powershell
 npm run ui
@@ -71,10 +69,9 @@ The same end-to-end flow can use the OpenAI agent for the intent and read-tool p
 ```powershell
 Copy-Item .env.example .env
 # Set OPENAI_API_KEY and OPENAI_MODEL in .env.
-npm run db:seed
 npm run demo:live
 ```
 
-In live mode, OpenAI selects only the read MCP tools. The application still performs the deterministic shortage calculation, creates the structured recommendation, enforces analyst/manager authorization, executes the write MCP tool, verifies the transaction, and prints the trace. This preserves the safety boundary while demonstrating the real provider path.
+In live mode, OpenAI selects only the read MCP tools. The application still performs the deterministic shortage calculation, creates the structured recommendation, enforces analyst/manager authorization, executes the write MCP tool, verifies the transaction, and prints the trace. This preserves the safety boundary while demonstrating the live provider path.
 
 See [INTERVIEW_WALKTHROUGH.md](INTERVIEW_WALKTHROUGH.md) for the recommended presentation order and [examples/end-to-end-run.md](examples/end-to-end-run.md) for representative output.

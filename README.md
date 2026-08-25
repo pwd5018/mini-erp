@@ -6,7 +6,7 @@ An interview-ready demonstration of a safe AI operations agent. The assistant ga
 
 The model interprets intent and plans tool calls. Application code owns business truth, validation, authorization, approval, idempotency, and execution. In a real deployment, the ERP API remains the final authority for ERP-owned business rules.
 
-See [ROADMAP.md](ROADMAP.md) for the complete vision, milestones, pending work, limitations, and restart instructions.
+See [ROADMAP.md](ROADMAP.md) for the project vision, implemented capabilities, scope boundaries, and restart instructions.
 
 For a ready-to-use presentation script, see [docs/INTERVIEW_WALKTHROUGH.md](docs/INTERVIEW_WALKTHROUGH.md). A representative result is in [docs/examples/end-to-end-run.md](docs/examples/end-to-end-run.md).
 

@@ -1,4 +1,4 @@
-# Phase 2 MCP read tools
+# MCP tools
 
 The read server is implemented in `src/mcp/readServer.ts` and uses the official Model Context Protocol TypeScript SDK. It exposes six read-only tools:
 
@@ -9,7 +9,7 @@ The read server is implemented in `src/mcp/readServer.ts` and uses the official 
 | `get_inventory` | Reads inventory across all warehouses for a product. |
 | `get_customer` | Reads a customer summary. |
 | `get_supplier` | Reads supplier lead time and reliability. |
-| `get_replenishment_requests` | Reads existing requests to support future duplicate prevention. |
+| `get_replenishment_requests` | Reads existing requests for verification and operational context. |
 
 Inputs are strict Zod schemas. The MCP SDK rejects malformed arguments before the business handler runs. Handler-level reads return structured content and a trace ID. Missing records return `isError: true` with a predictable error message.
 
