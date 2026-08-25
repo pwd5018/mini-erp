@@ -35,6 +35,8 @@ npm run demo
 
 The seed command creates `data/mini-erp.db`, which is intentionally ignored by Git.
 
+The browser demo also manages this local file: it resets from the canonical seed data at startup and persists its pending action, approval, and replenishment writes after each successful UI step. This is for inspection during the demonstration only; restarting the UI resets the demo database again.
+
 ## Status
 
 - Application foundation and TypeScript build: complete

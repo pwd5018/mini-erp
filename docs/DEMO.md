@@ -54,14 +54,15 @@ The demo uses the real in-memory MCP client/server boundary for both reads and w
 
 ## Browser approval console
 
-For a visual walkthrough, start the local approval console after seeding:
+For a visual walkthrough, start the local approval console:
 
 ```powershell
-npm run db:seed
 npm run ui
 ```
 
 Open [http://127.0.0.1:8787](http://127.0.0.1:8787). Click `Run agent analysis`, then `Approve as Operations Manager`, then `Execute approved action`. The page shows the recommendation, action state, final request ID, duplicate-execution result, and lifecycle trace. Use `npm run ui:live` instead of `npm run ui` to use the OpenAI agent for the analysis stage.
+
+The browser demo intentionally resets the in-memory database from the canonical `seedData` when it starts. After each successful analysis, approval, or execution step, it exports that database to `data/mini-erp.db`. This makes the pending `agent_actions` row and final `replenishment_requests` row available for inspection after the walkthrough, while keeping the next UI run deterministic. Starting the UI again resets the demo data and removes the previous walkthrough's action records. Automated tests use separate temporary databases and do not persist their writes.
 
 ## Live OpenAI agent variant
 

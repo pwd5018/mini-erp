@@ -14,6 +14,8 @@ The completed end-to-end demonstration composes these boundaries in `src/workflo
 
 The small browser approval console in `src/ui/` exposes the same staged operations over local HTTP. It is a demonstration surface only: it does not bypass MCP, application authorization, or transaction verification.
 
+The UI creates a fresh `sql.js` database from `seedData` at startup, then exports the database to `data/mini-erp.db` after each successful workflow mutation. This lets a reviewer inspect the persisted `agent_actions` and `replenishment_requests` records. The reset-on-start behavior is deliberate and keeps repeated demonstrations deterministic; automated tests remain isolated in-memory.
+
 Planned flow:
 
 ```text

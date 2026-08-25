@@ -12,4 +12,6 @@ The current role model is deliberately a demo. It does not integrate with SSO or
 
 The demonstration focus is deterministic role checks outside the model, explicit structured approvals for every write, strict Zod input schemas, record existence checks, idempotency keys, prompt-injection resistance, and verification after uncertain transactions.
 
+The local browser demo resets its ignored SQLite file from seed data at startup and persists the workflow after successful UI steps so the resulting action and replenishment records can be inspected. This persistence is intentionally local and demo-scoped; it is not a production durability, identity, backup, or multi-user design.
+
 The end-to-end demo also treats ERP text as untrusted data. The agent instructions explicitly ignore instructions embedded in order notes and descriptions, and the deterministic application layer does not derive authorization or write arguments from those fields. The write MCP schemas reject extra fields, including attempts to smuggle instructions into a mutation call.
